@@ -62,6 +62,7 @@ final class GistsListViewController<ViewModel: ObservableViewModel>:
                 view.addSubview(gistsListView)
                 gistsListView.frame = view.bounds
                 stopRefreshing()
+                gistsListView.tableView.reloadData()
             case .error:
                 self.gists = []
                 view.addSubview(errorView)
@@ -69,7 +70,6 @@ final class GistsListViewController<ViewModel: ObservableViewModel>:
                 errorView.retryAction = { [weak viewModel] in
                     viewModel?.handle(.didTappedRestartButton)
                 }
-                stopRefreshing()
         }
     }
     
@@ -90,6 +90,10 @@ final class GistsListViewController<ViewModel: ObservableViewModel>:
     private func stopRefreshing() {
         if refreshControl.isRefreshing {
             refreshControl.endRefreshing()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.gistsListView.tableView.reloadData()
+            }
         }
     }
     
